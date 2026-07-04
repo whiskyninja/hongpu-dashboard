@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>宏普陽明 儀表板</title>
+<style>
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --line:#DFDCD3; --ink:#26333B; --sub:#7A8288;
+  --accent:#1E5F74; --accent-ink:#FFFFFF; --head:#EAF1F3;
+  --up:#C23B3B; --dn:#3E8A5A; --star:#B07A1E;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#171D22; --panel:#1F272E; --line:#333E47; --ink:#DCE3E8; --sub:#8B979F;
+  --accent:#5FA8BD; --accent-ink:#10161A; --head:#26323B;
+  --up:#E06C6C; --dn:#63B888; --star:#D9A84E;
+}}
+:root[data-theme="dark"]{
+  --bg:#171D22; --panel:#1F272E; --line:#333E47; --ink:#DCE3E8; --sub:#8B979F;
+  --accent:#5FA8BD; --accent-ink:#10161A; --head:#26323B;
+  --up:#E06C6C; --dn:#63B888; --star:#D9A84E;
+}
+:root[data-theme="light"]{
+  --bg:#F7F6F2; --panel:#FFFFFF; --line:#DFDCD3; --ink:#26333B; --sub:#7A8288;
+  --accent:#1E5F74; --accent-ink:#FFFFFF; --head:#EAF1F3;
+  --up:#C23B3B; --dn:#3E8A5A; --star:#B07A1E;
+}
+html,body{background:var(--bg) !important;margin:0;min-height:100vh}
+.hp-wrap{font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+  max-width:1020px;margin:0 auto;padding:28px 18px 48px;color:var(--ink);
+  background:var(--bg);font-size:15px;line-height:1.55}
+.hp-wrap h1{font-size:21px;margin:0 0 2px;letter-spacing:.5px}
+.hp-wrap .stamp{color:var(--sub);font-size:12.5px;margin-bottom:20px}
+.hp-wrap h2{font-size:15px;margin:34px 0 10px;color:var(--accent);
+  text-transform:none;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.hp-wrap h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card .v{font-size:23px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+.card.gain .v{color:var(--up)}
+.card .l{font-size:12px;color:var(--sub);margin-top:3px}
+.slider{margin:14px 0 4px;font-size:13.5px;color:var(--sub);display:flex;align-items:center;
+  gap:10px;flex-wrap:wrap}
+.slider input{accent-color:var(--accent);width:200px}
+.slider b{color:var(--ink);font-variant-numeric:tabular-nums}
+.tblbox{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+table.hp{border-collapse:collapse;width:100%;font-size:13.5px;min-width:640px}
+table.hp th{background:var(--head);font-weight:600;text-align:right;padding:8px 11px;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+table.hp td{padding:7px 11px;text-align:right;border-bottom:1px solid var(--line);
+  font-variant-numeric:tabular-nums}
+table.hp tr:last-child td{border-bottom:none}
+table.hp th:first-child,table.hp td:first-child{text-align:left}
+.up{color:var(--up);font-weight:600}.dn{color:var(--dn);font-weight:600}
+.star{color:var(--star);font-weight:700}
+.imp{font-weight:700}
+.muted{color:var(--sub);font-size:12.5px;margin:8px 2px}
+.hp-wrap a{color:var(--accent)}
+.todo td:last-child{white-space:nowrap}
+.foot{color:var(--sub);font-size:11.5px;margin-top:36px;border-top:1px solid var(--line);
+  padding-top:12px}
+.tabs{display:flex;gap:8px;max-width:1020px;margin:0 auto;padding:16px 18px 0;
+  font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif}
+.tabs button{background:var(--panel);color:var(--sub);border:1px solid var(--line);
+  border-radius:8px 8px 0 0;padding:9px 22px;font-size:14.5px;cursor:pointer;
+  font-family:inherit;border-bottom:none}
+.tabs button.on{color:var(--accent);font-weight:700;border-color:var(--accent);
+  background:var(--bg)}
+</style>
+</head>
+<body>
+<div class="tabs">
+ <button id="tabBtnDash" class="on" onclick="hpTab('dash')">📊 儀表板</button>
+ <button id="tabBtnSim" onclick="hpTab('sim')">🧮 賣租自住試算器</button>
+</div>
+<div id="tabDash">
+<div class="hp-wrap">
+<h1>宏普陽明 儀表板</h1>
+<div class="stamp">資料更新 2026-07-04 07:46｜591 在售 15 件（唯一戶 5）</div>
+
+<div class="cards">
+ <div class="card"><div class="v">6,670 萬</div><div class="l">隱含開價中位（換算自有戶）</div></div>
+ <div class="card"><div class="v" id="dealVal">6,336 萬</div>
+   <div class="l">推估成交值（開價 × <span id="pctLabel">95</span>%）</div></div>
+ <div class="card gain"><div class="v" id="gainVal">+888 萬</div>
+   <div class="l">vs 成本 5,448 萬</div></div>
+ <div class="card"><div class="v" id="gainPct">+16.3%</div>
+   <div class="l">權益報酬（已投入 1,094 萬計為 +81%）</div></div>
+</div>
+<div class="slider">成交折數假設
+ <input type="range" id="pct" min="88" max="100" value="95" oninput="hpRecalc()">
+ <b id="pctShow">95%</b><span>（累積實登配對後改用實際折數）</span></div>
+
+<h2>① 隱含估值明細</h2>
+<div class="tblbox"><table class="hp">
+<tr><th>樓層</th><th>坪數</th><th>開價(萬)</th><th>2023 原價(萬)</th><th>漲幅</th>
+<th>換算自有戶(萬)</th><th>來源</th></tr><tr><td>7F/14F</td><td>48.65 坪</td><td>5,388</td><td>4,216</td><td class='up'>+27.8%</td><td class='imp'>6,962</td><td><a href='https://sale.591.com.tw/home/house/detail/2/20459761.html' target='_blank' rel='noopener'>591</a>　劉勁松</td></tr><tr><td>8F/14F</td><td>40.3 坪</td><td>4,320</td><td>3,450</td><td class='up'>+25.2%</td><td class='imp'>6,822</td><td><a href='https://sale.591.com.tw/home/house/detail/2/20392380.html' target='_blank' rel='noopener'>591</a>　楊書宇</td></tr><tr><td>6F/14F</td><td>57.76 坪</td><td>6,388</td><td>5,218</td><td class='up'>+22.4%</td><td class='imp'>6,670</td><td><a href='https://sale.591.com.tw/home/house/detail/2/20169788.html' target='_blank' rel='noopener'>591</a>　劉勁松</td></tr><tr><td>11F/14F</td><td>42.88 坪</td><td>4,568</td><td>3,815</td><td class='up'>+19.7%</td><td class='imp'>6,523</td><td><a href='https://sale.591.com.tw/home/house/detail/2/20149062.html' target='_blank' rel='noopener'>591</a>　林宏彰</td></tr><tr><td>2F/14F</td><td>42.88 坪</td><td>4,388</td><td>3,775</td><td class='up'>+16.2%</td><td class='imp'>6,333</td><td><a href='https://sale.591.com.tw/home/house/detail/2/20313482.html' target='_blank' rel='noopener'>591</a>　劉勁松</td></tr><tr><td>11F/11F</td><td>31.76 坪</td><td>4,568</td><td>—</td><td>—</td><td>—</td><td><a href='https://sale.591.com.tw/home/house/detail/2/20252420.html' target='_blank' rel='noopener'>591</a>　鄭銘傑</td></tr></table></div>
+<p class="muted">換算值＝開價 ×（自有戶原價 5,448 ÷ 該戶 2023 原價）；
+原價為樂居 99 筆同坪同樓平均（含車位）；開價非成交價。</p>
+
+<h2>② 成交配對驗證（下架 × 實價登錄）</h2>
+<p class='muted'>尚無配對（下架紀錄 0 筆、實登宏普陽明 0 筆）。累積後自動顯示本社區專屬「成交/開價折數」。</p>
+
+<h2>③ 成本與資金</h2>
+<div class="cards">
+ <div class="card"><div class="v">1,094 萬</div><div class="l">已投入（至 2025/09）</div></div>
+ <div class="card"><div class="v">4,354 萬</div><div class="l">未付＝貸款 4,081＋交屋款 273</div></div>
+ <div class="card"><div class="v">−29.7 萬</div><div class="l">客變退款（交屋抵扣）</div></div>
+ <div class="card"><div class="v">260～350 萬</div><div class="l">裝潢預算（浩室 9 萬/坪起）</div></div>
+</div>
+
+<h2>④ 稅務倒數（交屋暫以 2027-06-01 計）</h2>
+<div class="cards">
+ <div class="card"><div class="v" id="d45">—</div><div class="l">距 45%→35%（2029-06-01）</div></div>
+ <div class="card"><div class="v" id="d20">—</div><div class="l">距 35%→20%（2032-06-01）</div></div>
+ <div class="card"><div class="v" id="d6y">—</div><div class="l">距自住 6 年優惠（2033-06-01）</div></div>
+</div>
+<p class="muted">交屋前換約出售＝權利交易 35%（自 2023/06 簽約起算已滿 2 年）。
+交屋當年 9/22 前申請地價稅自用、次年 3/22 前申報房屋稅自住。</p>
+
+<h2>⑤ 待辦進度</h2>
+<div class="tblbox"><table class="hp todo">
+<tr><th>項目</th><th>狀態</th></tr>
+<tr><td>機會成本分析｜實登監測(含換約b檔)｜換約月報｜驗屋核對表｜裝潢時程｜保險｜稅務時間軸</td><td>✅ 完成</td></tr>
+<tr><td>貸款試算＋賣租自住試算器（合併）</td><td>2027 前</td></tr>
+<tr><td>資產配置全貌（併現金統計）</td><td>待做</td></tr>
+<tr><td>輝達北士科進度監測</td><td>待做</td></tr>
+<tr><td>2026/09 重啟浩室討論｜2027/02 前下訂長交期家電</td><td>⏰ 時間觸發</td></tr>
+</table></div>
+
+<div class="foot">資料來源：591 換約監測／內政部實價登錄 Open Data／樂居 99 筆原始成交。
+本頁月更由「跑換約監測」流程重新產生。</div>
+</div>
+<script>
+(function(){
+  var MED = 6670, COST = 5448, PAID = 1094;
+  window.hpRecalc = function(){
+    var p = document.getElementById('pct').value;
+    document.getElementById('pctShow').textContent = p + '%';
+    document.getElementById('pctLabel').textContent = p;
+    var deal = MED * p / 100, g = Math.round(deal - COST);
+    document.getElementById('dealVal').textContent = Math.round(deal).toLocaleString() + ' 萬';
+    document.getElementById('gainVal').textContent = (g >= 0 ? '+' : '') + g.toLocaleString() + ' 萬';
+    document.getElementById('gainPct').textContent = ((deal/COST - 1) * 100).toFixed(1) + '%';
+  };
+  function days(to){
+    var d = Math.ceil((new Date(to) - new Date()) / 86400000);
+    return d <= 0 ? '已達成 ✓' : d.toLocaleString() + ' 天';
+  }
+  document.getElementById('d45').textContent = days('2029-06-01');
+  document.getElementById('d20').textContent = days('2032-06-01');
+  document.getElementById('d6y').textContent = days('2033-06-01');
+})();
+</script></div><div id="tabSim" style="display:none">
+<style>
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --line:#DFDCD3; --ink:#26333B; --sub:#7A8288;
+  --accent:#1E5F74; --head:#EAF1F3;
+  --up:#C23B3B; --dn:#3E8A5A; --win:#B07A1E;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#171D22; --panel:#1F272E; --line:#333E47; --ink:#DCE3E8; --sub:#8B979F;
+  --accent:#5FA8BD; --head:#26323B; --up:#E06C6C; --dn:#63B888; --win:#D9A84E;
+}}
+:root[data-theme="dark"]{
+  --bg:#171D22; --panel:#1F272E; --line:#333E47; --ink:#DCE3E8; --sub:#8B979F;
+  --accent:#5FA8BD; --head:#26323B; --up:#E06C6C; --dn:#63B888; --win:#D9A84E;
+}
+:root[data-theme="light"]{
+  --bg:#F7F6F2; --panel:#FFFFFF; --line:#DFDCD3; --ink:#26333B; --sub:#7A8288;
+  --accent:#1E5F74; --head:#EAF1F3; --up:#C23B3B; --dn:#3E8A5A; --win:#B07A1E;
+}
+html,body{background:var(--bg) !important;margin:0;min-height:100vh}
+.sim{font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+  max-width:1020px;margin:0 auto;padding:28px 18px 48px;color:var(--ink);
+  font-size:15px;line-height:1.55}
+.sim h1{font-size:21px;margin:0 0 2px}
+.sim .stamp{color:var(--sub);font-size:12.5px;margin-bottom:18px}
+.sim h2{font-size:15px;margin:30px 0 10px;color:var(--accent);letter-spacing:1px;
+  display:flex;align-items:center;gap:8px}
+.sim h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:8px 26px}
+.ctl{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:4px 0}
+.ctl label{flex:0 0 128px;color:var(--sub)}
+.ctl input[type=range]{flex:1;accent-color:var(--accent);min-width:80px}
+.ctl select{background:var(--panel);color:var(--ink);border:1px solid var(--line);
+  border-radius:5px;padding:2px 6px;font-size:13.5px}
+.ctl b{flex:0 0 86px;text-align:right;font-variant-numeric:tabular-nums}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px 15px}
+.card .v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+.card .l{font-size:12px;color:var(--sub);margin-top:3px}
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.path{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;
+  position:relative}
+.path.best{border-color:var(--win);box-shadow:0 0 0 1px var(--win)}
+.path .badge{position:absolute;top:-10px;right:12px;background:var(--win);color:#fff;
+  font-size:11px;padding:2px 10px;border-radius:10px;display:none}
+.path.best .badge{display:block}
+.path h3{margin:0 0 4px;font-size:15px}
+.path .fv{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums}
+.path .irr{font-size:14px;font-weight:600;margin-bottom:8px}
+.path .det{font-size:12.3px;color:var(--sub);line-height:1.75}
+.pos{color:var(--up)}.neg{color:var(--dn)}
+.muted{color:var(--sub);font-size:12.5px;margin:8px 2px}
+.foot{color:var(--sub);font-size:11.5px;margin-top:34px;border-top:1px solid var(--line);
+  padding-top:12px;line-height:1.7}
+</style>
+<div class="sim">
+<h1>宏普陽明 賣 / 租 / 自住 試算器</h1>
+<div class="stamp">三路徑同一資金基準比較｜拖拉參數即時重算｜金額單位：萬元</div>
+
+<h2>參數</h2>
+<div class="panel"><div class="grid">
+ <div class="ctl"><label>目前市值</label><input type="range" id="v0" min="5500" max="7500" step="50" value="6350"><b id="v0v"></b></div>
+ <div class="ctl"><label>房價年漲率</label><input type="range" id="g" min="-2" max="8" step="0.5" value="3"><b id="gv"></b></div>
+ <div class="ctl"><label>貸款金額</label><input type="range" id="L" min="3000" max="4350" step="50" value="4100"><b id="Lv"></b></div>
+ <div class="ctl"><label>房貸利率</label><input type="range" id="i" min="1.5" max="3.5" step="0.05" value="2.2"><b id="iv"></b></div>
+ <div class="ctl"><label>年期 / 寬限</label>
+   <select id="n"><option>20</option><option selected>30</option><option>40</option></select> 年
+   <select id="gr"><option>0</option><option>2</option><option selected>3</option><option>5</option></select> 年寬限<b></b></div>
+ <div class="ctl"><label>月租金行情</label><input type="range" id="rent" min="5" max="10" step="0.25" value="7"><b id="rentv"></b></div>
+ <div class="ctl"><label>股市替代報酬</label><input type="range" id="rs" min="3" max="12" step="0.5" value="8"><b id="rsv"></b></div>
+ <div class="ctl"><label>持有年數(交屋起)</label><input type="range" id="h" min="1" max="10" step="1" value="6"><b id="hv"></b></div>
+ <div class="ctl"><label>自住裝潢</label><input type="range" id="renoC" min="150" max="450" step="10" value="300"><b id="renoCv"></b></div>
+ <div class="ctl"><label>出租簡裝</label><input type="range" id="renoB" min="30" max="250" step="10" value="100"><b id="renoBv"></b></div>
+ <div class="ctl"><label>持有成本/年</label><input type="range" id="hold" min="8" max="25" step="1" value="15"><b id="holdv"></b></div>
+</div></div>
+
+<h2>房貸月付金</h2>
+<div class="cards">
+ <div class="card"><div class="v" id="pmtG">—</div><div class="l">寬限期內（只繳息）</div></div>
+ <div class="card"><div class="v" id="pmtF">—</div><div class="l">寬限期後（本息攤還）</div></div>
+ <div class="card"><div class="v" id="cashClose">—</div><div class="l">交屋現金（尾款 4,354 − 貸款）</div></div>
+ <div class="card"><div class="v" id="baseCap">—</div><div class="l">比較基準資金（已投1,094＋交屋現金＋裝潢）</div></div>
+</div>
+<p class="muted" id="newqing"></p>
+
+<h2>三路徑比較（<span id="hEcho">6</span> 年後）</h2>
+<div class="paths">
+ <div class="path" id="pA"><span class="badge">最優</span><h3>A｜交屋前換約賣</h3>
+  <div class="fv" id="fvA">—</div><div class="irr" id="irrA">—</div><div class="det" id="detA"></div></div>
+ <div class="path" id="pB"><span class="badge">最優</span><h3>B｜出租收租</h3>
+  <div class="fv" id="fvB">—</div><div class="irr" id="irrB">—</div><div class="det" id="detB"></div></div>
+ <div class="path" id="pC"><span class="badge">最優</span><h3>C｜自住</h3>
+  <div class="fv" id="fvC">—</div><div class="irr" id="irrC">—</div><div class="det" id="detC"></div></div>
+</div>
+<p class="muted">終值＝路徑到第 N 年的總淨資產（含賣房淨得＋期間現金流以股市報酬複利）；年化＝(終值/基準資金)^(1/N)−1。</p>
+
+<div class="foot"><b>模型假設（簡化，非稅務意見）：</b>
+取得成本固定 5,448；換約(A)費用 1.5%、稅 35%（權利交易，已持有逾2年）；
+成屋出售費用 4%（仲介+代書+雜支）；房地合一稅率依交屋後持有年數 &lt;2年45%、2-5年35%、5-10年20%、&gt;10年15%；
+C 路徑滿 6 年適用自住優惠（獲利 400 萬免稅、超過部分 10%），且裝潢發票列入成本；B 路徑裝潢發票同列成本；
+出租淨收＝租金 × 70%（扣所得稅/空置/修繕）；自住隱含房租免稅；期間現金流按月以股市報酬率複利；
+未計土增稅（自用可忽略）與租金成長。新青安上限 1,000 萬、本案貸款超過，不適用。
+</div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const ids=['v0','g','L','i','rent','rs','h','renoC','renoB','hold'];
+const COST=5448, PAID=1094, REMAIN=4354;
+
+function fmt(x){return Math.round(x).toLocaleString('zh-TW');}
+function pct(x){return (x*100).toFixed(1)+'%';}
+
+function taxRate(h){return h<2?0.45:h<5?0.35:h<10?0.20:0.15;}
+
+function balanceAfter(L,r,nMonths,paid){ // 本息攤還剩餘本金
+  const pmt=L*r/(1-Math.pow(1+r,-nMonths));
+  return L*Math.pow(1+r,paid)-pmt*((Math.pow(1+r,paid)-1)/r);
+}
+
+function calc(){
+  const v0=+$('v0').value, g=+$('g').value/100, L=+$('L').value, i=+$('i').value/100;
+  const n=+$('n').value, gr=+$('gr').value, rent=+$('rent').value, rs=+$('rs').value/100;
+  const h=+$('h').value, renoC=+$('renoC').value, renoB=+$('renoB').value, hold=+$('hold').value;
+
+  $('v0v').textContent=fmt(v0)+' 萬'; $('gv').textContent=(g*100).toFixed(1)+'%';
+  $('Lv').textContent=fmt(L)+' 萬 ('+(L/COST*100).toFixed(0)+'成)';
+  $('iv').textContent=(i*100).toFixed(2)+'%';
+  $('rentv').textContent=rent.toFixed(2)+' 萬';
+  $('rsv').textContent=(rs*100).toFixed(1)+'%';
+  $('hv').textContent=h+' 年'; $('hEcho').textContent=h;
+  $('renoCv').textContent=fmt(renoC)+' 萬'; $('renoBv').textContent=fmt(renoB)+' 萬';
+  $('holdv').textContent=fmt(hold)+' 萬';
+
+  const r=i/12, gm=Math.pow(1+rs,1/12)-1;
+  const pmtG=L*r;                                  // 寬限只繳息(萬/月)
+  const nAmort=(n-gr)*12;
+  const pmtF=L*r/(1-Math.pow(1+r,-nAmort));        // 攤還月付
+  const cashClose=REMAIN-L;
+  const base=PAID+cashClose+renoC;                 // 共同基準資金
+  $('pmtG').textContent=fmt(pmtG*10000/1)==='NaN'?'—':Math.round(pmtG*10000).toLocaleString()+' 元';
+  $('pmtF').textContent=Math.round(pmtF*10000).toLocaleString()+' 元';
+  $('cashClose').textContent=fmt(cashClose)+' 萬';
+  $('baseCap').textContent=fmt(base)+' 萬';
+  $('newqing').textContent='貸款 '+fmt(L)+' 萬（利率 '+(i*100).toFixed(2)+'%、'+n+' 年、寬限 '+gr+' 年）';
+
+  // 貸款餘額於第 h 年
+  const mPaid=Math.max(0,(h-gr)*12);
+  const bal= h<=gr ? L : balanceAfter(L,r,nAmort,mPaid);
+
+  // 期間現金流複利終值（每月 flow，前 gr 年付息、之後攤還）
+  function fvFlows(monthlyIncome){
+    let fv=0;
+    for(let m=1;m<=h*12;m++){
+      const pay=(m<=gr*12)?pmtG:pmtF;
+      const flow=monthlyIncome-pay-hold/12;
+      fv=(fv+flow)*(1+gm);
+    }
+    return fv;
+  }
+
+  const vh=v0*Math.pow(1+g,h);
+
+  // A 換約賣：稅後淨得 + 未動用資金 全數入股市 h 年
+  const gainA=v0*0.985-COST;
+  const taxA=Math.max(gainA,0)*0.35;
+  const netA=PAID+gainA-taxA;
+  const fvA=(netA+cashClose+renoC)*Math.pow(1+rs,h);
+
+  // B 出租：t0 花 cashClose+renoB，剩 renoC-renoB 入股市
+  const fvStockB=(renoC-renoB)*Math.pow(1+rs,h);
+  const fvFlowB=fvFlows(rent*0.7);
+  const gainB=vh*0.96-COST-renoB;
+  const taxB=Math.max(gainB,0)*taxRate(h);
+  const saleB=vh*0.96-bal-taxB;
+  const fvB=saleB+fvFlowB+fvStockB;
+
+  // C 自住：t0 花 cashClose+renoC；隱含房租=rent 免稅
+  const fvFlowC=fvFlows(rent);
+  const gainC=vh*0.96-COST-renoC;
+  const taxC=h>=6?Math.max(gainC-400,0)*0.10:Math.max(gainC,0)*taxRate(h);
+  const saleC=vh*0.96-bal-taxC;
+  const fvC=saleC+fvFlowC;
+
+  const res=[['A',fvA],['B',fvB],['C',fvC]];
+  const best=res.reduce((a,b)=>b[1]>a[1]?b:a)[0];
+  function show(k,fv,det){
+    $('fv'+k).textContent=fmt(fv)+' 萬';
+    const ann=Math.pow(fv/base,1/h)-1;
+    const e=$('irr'+k);
+    e.textContent='年化 '+(ann>=0?'+':'')+pct(ann);
+    e.className='irr '+(ann>=0?'pos':'neg');
+    $('det'+k).innerHTML=det;
+    $('p'+k).classList.toggle('best',k===best);
+  }
+  show('A',fvA,
+    '換約價 '+fmt(v0)+'，費用1.5%、稅 '+fmt(taxA)+'<br>稅後淨得 '+fmt(netA)+
+    ' 萬<br>連同未動用 '+fmt(cashClose+renoC)+' 萬入股市 '+(rs*100).toFixed(1)+'%');
+  show('B',fvB,
+    h+' 年後售 '+fmt(vh)+'，稅 '+fmt(taxB)+'（'+(taxRate(h)*100)+'%）<br>賣房淨得 '+fmt(saleB)+
+    ' 萬<br>租金流終值 '+fmt(fvFlowB)+' 萬'+(fvFlowB<0?'（月現金流為負）':''));
+  show('C',fvC,
+    h+' 年後售 '+fmt(vh)+'，稅 '+fmt(taxC)+(h>=6?'（自住優惠）':'（'+(taxRate(h)*100)+'%）')+
+    '<br>賣房淨得 '+fmt(saleC)+' 萬<br>省房租流終值 '+fmt(fvFlowC)+' 萬');
+}
+ids.forEach(id=>$(id).addEventListener('input',calc));
+$('n').addEventListener('change',calc);$('gr').addEventListener('change',calc);
+calc();
+})();
+</script>
+</div>
+<script>
+function hpTab(w){
+  document.getElementById('tabDash').style.display = w==='dash'?'':'none';
+  document.getElementById('tabSim').style.display = w==='sim'?'':'none';
+  document.getElementById('tabBtnDash').className = w==='dash'?'on':'';
+  document.getElementById('tabBtnSim').className = w==='sim'?'on':'';
+}
+</script>
+</body>
+</html>
